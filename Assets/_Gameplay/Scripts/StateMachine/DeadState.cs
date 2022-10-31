@@ -7,8 +7,7 @@ public class DeadState : BaseState
     public override void EnterState(BattleStateMachine stateMachine)
     {
         // Set Anim
-        stateMachine.animator.SetBool("IsAttack", false);
-        stateMachine.animator.SetBool("IsDead", true);
+        stateMachine.animator.SetTrigger("Dead");
     }
 
     public override void UpdateState(BattleStateMachine stateMachine)

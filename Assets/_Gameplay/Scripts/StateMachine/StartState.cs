@@ -10,7 +10,8 @@ public class StartState : BaseState
     private Transform battleTransform;
     public override void EnterState(BattleStateMachine stateMachine)
     {
-        stateMachine.animator.SetBool("IsIdle", false);
+        //stateMachine.animator.SetBool("IsIdle", false);
+        stateMachine.animator.SetTrigger("Move");
         machineTransform = stateMachine.transform;
         machineTransform.position = stateMachine.initTransform.position;
         speed = stateMachine.speed;
@@ -26,17 +27,8 @@ public class StartState : BaseState
         }
         else
         {
-            // Check if start battle first
-            if (BattleManager.Ins.GetCurrentStateMachine() == stateMachine)
-            {
-                stateMachine.SwitchState(stateMachine.idleState);
-                //return;
-            }
-            else
-            {
-                BattleManager.Ins.EndTurn(stateMachine);
-                stateMachine.SwitchState(stateMachine.idleState);
-            }
+            machineTransform.position = battleTransform.position;
+            stateMachine.SwitchState(stateMachine.idleState);
         }
     }
 

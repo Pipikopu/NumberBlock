@@ -59,6 +59,7 @@ public class BattleStateMachine : MonoBehaviour
 
     public void GetHit()
     {
+        stateMachine.animator.SetTrigger("GetHit");
         //StartCoroutine(IGetHit());
     }
 

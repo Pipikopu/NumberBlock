@@ -38,10 +38,13 @@ public class Player : MonoBehaviour
     {
         // Player Start Running
         canPlay = false;
-        isIdle = false;
+        //isIdle = false;
         isWin = false;
+        isIdle = false;
         isRunWinScene = false;
-        playerAnimator.SetBool("IsIdle", true);
+
+        //playerAnimator.SetBool("IsIdle", true);
+        playerAnimator.SetTrigger("Idle");
     }
 
     private void Update()
@@ -50,9 +53,10 @@ public class Player : MonoBehaviour
         {
             if (isWin)
             {
+                //playerAnimator.SetTrigger("Move");
                 MoveToWin();
             }
-            else
+            else if (!isIdle)
             {
                 MoveToWave();
             }
@@ -85,11 +89,8 @@ public class Player : MonoBehaviour
         else
         {
             playerTransform.position = stopTransform.position;
-            if (!isIdle)
-            {
-                playerAnimator.SetBool("IsIdle", true);
-                isIdle = true;
-            }
+            playerAnimator.SetTrigger("Idle");
+            isIdle = true;
         }
     }
 
@@ -113,11 +114,7 @@ public class Player : MonoBehaviour
     public void Lose()
     {
         // Lose Game
-        Debug.Log("You Lose");
         StartCoroutine(DelayLose());
-        //endgameText.gameObject.SetActive(true);
-        //endgameText.text = "You Lose";
-
     }
 
     IEnumerator DelayLose()
@@ -128,25 +125,24 @@ public class Player : MonoBehaviour
 
     public void RunToWin()
     {
-        Debug.Log("Victory!!!");
-        playerAnimator.SetBool("IsIdle", false);
         navigateCanvas.SetActive(false);
         StartCoroutine(DelayRunToWin());
-        //endgameText.gameObject.SetActive(true);
-        //endgameText.text = "You Win";
     }
 
     IEnumerator DelayRunToWin()
     {
-        yield return new WaitForSeconds(1f);
+        playerAnimator.SetTrigger("Move");
         isWin = true;
+
+        yield return new WaitForSeconds(2f);
     }
 
     public void Win()
     {
         playerModel.Rotate(0f, 180f, 0f, Space.Self);
-        playerAnimator.SetBool("IsIdle", true);
-        playerAnimator.SetBool("IsWin", true);
+        //playerAnimator.SetBool("IsIdle", true);
+        //playerAnimator.SetBool("IsWin", true);
+        playerAnimator.SetTrigger("Win");
         chestClose.SetActive(false);
         chestOpen.SetActive(true);
         winWindow.SetActive(true);
@@ -154,13 +150,14 @@ public class Player : MonoBehaviour
 
     public void AllowPlay()
     {
-        playerAnimator.SetBool("IsIdle", false);
+        //playerAnimator.SetBool("IsIdle", false);
+        playerAnimator.SetTrigger("Move");
         StartCoroutine(DelayPlay());
     }
 
     IEnumerator DelayPlay()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         canPlay = true;
     }
 }

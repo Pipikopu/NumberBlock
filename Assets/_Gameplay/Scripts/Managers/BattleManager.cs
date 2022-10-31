@@ -27,6 +27,13 @@ public class BattleManager : Singleton<BattleManager>
     [Header("StateMachine")]
     private BattleStateMachine currentStateMachine;
 
+    private bool canBattle;
+
+    private void Start()
+    {
+        canBattle = false;
+    }
+
     public void MoveToBattle()
     {
         // Set Init UI
@@ -47,43 +54,55 @@ public class BattleManager : Singleton<BattleManager>
         battleEnemy.health = DataManager.Ins.GetBattleEnemyStrength();
         battleEnemyGO.SetActive(true);
 
-
         // Set Current Machine
+        StartCoroutine(WaitForMachineToMove());
+    }
+
+    IEnumerator WaitForMachineToMove()
+    {
+        yield return new WaitForSeconds(1f);
+        canBattle = true;
         currentStateMachine = battlePlayer;
     }
 
-    public void EndTurn(BattleStateMachine stateMachine)
+    public void Update()
     {
-        if (stateMachine == battleEnemy && battlePlayer.health >= 0)
+        if (canBattle)
         {
-            StartCoroutine(PlayerDealAttack());
-        }
-        else if (stateMachine == battlePlayer && battleEnemy.health >= 0)
-        {
-            StartCoroutine(EnemyDealAttack());
+            canBattle = false;
+            if (currentStateMachine == battlePlayer)
+            {
+                StartCoroutine(PlayerDealAttack());
+            }
+            else
+            {
+                StartCoroutine(EnemyDealAttack());
+            }
         }
     }
 
     IEnumerator PlayerDealAttack()
     {
+        yield return new WaitForSeconds(0.7f);
         // Start Attack
         if (battlePlayer.strength / 4 >= battleEnemy.health)
         {
             battlePlayer.SwitchState(battlePlayer.comboState);
+            yield return new WaitForSeconds(0.75f);
+            battleEnemy.SwitchState(battleEnemy.deadState);
+
+            enemyHealthSlider.value = 0;
+
+            player.IncreaseStrength(battleEnemy.strength);
+            StartCoroutine(DoneBattle());
         }
         else
         {
             battlePlayer.SwitchState(battlePlayer.attackState);
-            yield return new WaitForSeconds(0.5f);
+            // Delay when enemy get hit
+            yield return new WaitForSeconds(0.4f);
             battleEnemy.GetHit();
-        }
 
-        // Delay
-        yield return new WaitForSeconds(0.5f);
-
-        if (battlePlayer.health > 0)
-        {
-            // Set Health Bar
             battleEnemy.health -= (float)(battlePlayer.strength / 4);
             float newValue = battleEnemy.health / battleEnemy.strength;
             if (newValue < 0.15f && newValue > 0)
@@ -92,39 +111,32 @@ public class BattleManager : Singleton<BattleManager>
             }
             enemyHealthSlider.value = newValue;
 
-            // Check State
-            if (battleEnemy.health <= 0)
-            {
-                battleEnemy.SwitchState(battleEnemy.deadState);
-                player.IncreaseStrength(battleEnemy.strength);
-
-                // Win All
-
-                StartCoroutine(DoneBattle());
-            }
+            canBattle = true;
+            currentStateMachine = battleEnemy;
+            battlePlayer.SwitchState(battlePlayer.idleState);
         }
     }
 
     IEnumerator EnemyDealAttack()
     {
+        yield return new WaitForSeconds(0.7f);
+
         // Start Attack
         if (battleEnemy.strength / 4 >= battlePlayer.health)
         {
             battleEnemy.SwitchState(battleEnemy.comboState);
+            yield return new WaitForSeconds(0.75f);
+            battlePlayer.SwitchState(battlePlayer.deadState);
+
+            playerHealthSlider.value = 0;
+            player.Lose();
         }
         else
         {
             battleEnemy.SwitchState(battleEnemy.attackState);
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.4f);
             battlePlayer.GetHit();
-        }
 
-        // Delay
-        yield return new WaitForSeconds(0.5f);
-
-        if (battleEnemy.health > 0)
-        {
-            // Set Health Bar
             battlePlayer.health -= (float)(battleEnemy.strength / 4);
             float newValue = battlePlayer.health / battlePlayer.strength;
             if (newValue <= 0.15f && newValue > 0)
@@ -133,12 +145,9 @@ public class BattleManager : Singleton<BattleManager>
             }
             playerHealthSlider.value = newValue;
 
-            // Check State
-            if (battlePlayer.health <= 0)
-            {
-                battlePlayer.SwitchState(battlePlayer.deadState);
-                player.Lose();
-            }
+            canBattle = true;
+            currentStateMachine = battlePlayer;
+            battleEnemy.SwitchState(battleEnemy.idleState);
         }
     }
 
@@ -159,5 +168,10 @@ public class BattleManager : Singleton<BattleManager>
     public BattleStateMachine GetCurrentStateMachine()
     {
         return currentStateMachine;
+    }
+
+    public BattleStateMachine GetBattlePlayer()
+    {
+        return battlePlayer;
     }
 }

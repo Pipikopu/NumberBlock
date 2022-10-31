@@ -7,7 +7,7 @@ public class IdleState : BaseState
     public override void EnterState(BattleStateMachine stateMachine)
     {
         //Set Anim
-        stateMachine.animator.SetBool("IsIdle", true);
+        stateMachine.animator.SetTrigger("Idle");
     }
 
     public override void UpdateState(BattleStateMachine stateMachine)

@@ -4,25 +4,16 @@ using UnityEngine;
 
 public class ComboState : BaseState
 {
-    private float timeCounter;
+    //private float timeCounter;
 
     public override void EnterState(BattleStateMachine stateMachine)
     {
-        timeCounter = 0;
-
-        stateMachine.animator.SetBool("IsCombo", true);
+        //timeCounter = 0;
+        stateMachine.animator.SetTrigger("Combo");
     }
 
     public override void ExitState(BattleStateMachine stateMachine)
     {
-        timeCounter += Time.deltaTime;
-        if (timeCounter >= stateMachine.timeAttack)
-        {
-            stateMachine.animator.SetBool("IsCombo", false);
-            BattleManager.Ins.EndTurn(stateMachine);
-            stateMachine.SwitchState(stateMachine.idleState);
-        }
-
     }
 
     public override void UpdateState(BattleStateMachine stateMachine)

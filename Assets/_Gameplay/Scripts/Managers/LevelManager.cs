@@ -27,7 +27,7 @@ public class LevelManager : Singleton<LevelManager>, IPointerDownHandler
 
     private void Update()
     {
-
+        
     }
 
     private void SetPlayer()
