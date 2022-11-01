@@ -16,8 +16,6 @@ public class BattleManager : Singleton<BattleManager>
     public BattleStateMachine battleEnemy;
     public GameObject battleEnemyGO;
     public Transform battleEnemyTransform;
-    //public Transform enemyHolderTransform;
-    private Enemy enemy;
 
     [Header("UI")]
     public GameObject battleUI;
@@ -34,7 +32,7 @@ public class BattleManager : Singleton<BattleManager>
         canBattle = false;
     }
 
-    public void MoveToBattle()
+    public void MoveToBattle(int enemyStrength)
     {
         // Set Init UI
         battleUI.SetActive(true);
@@ -49,9 +47,7 @@ public class BattleManager : Singleton<BattleManager>
 
 
         // Set Battle Enemy
-        //EnemySO battleEnemySO = DataManager.Ins.GetBattleEnemy();
-        battleEnemy.strength = DataManager.Ins.GetBattleEnemyStrength();
-        battleEnemy.health = DataManager.Ins.GetBattleEnemyStrength();
+        SetEnemyData(enemyStrength);
         battleEnemyGO.SetActive(true);
 
         // Set Current Machine
@@ -83,9 +79,9 @@ public class BattleManager : Singleton<BattleManager>
 
     IEnumerator PlayerDealAttack()
     {
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.4f);
         // Start Attack
-        if (battlePlayer.strength / 4 >= battleEnemy.health)
+        if (battlePlayer.strength / 3 >= battleEnemy.health)
         {
             battlePlayer.SwitchState(battlePlayer.comboState);
             yield return new WaitForSeconds(0.75f);
@@ -100,10 +96,10 @@ public class BattleManager : Singleton<BattleManager>
         {
             battlePlayer.SwitchState(battlePlayer.attackState);
             // Delay when enemy get hit
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(0.2f);
             battleEnemy.GetHit();
 
-            battleEnemy.health -= (float)(battlePlayer.strength / 4);
+            battleEnemy.health -= (float)(battlePlayer.strength / 3);
             float newValue = battleEnemy.health / battleEnemy.strength;
             if (newValue < 0.15f && newValue > 0)
             {
@@ -119,10 +115,10 @@ public class BattleManager : Singleton<BattleManager>
 
     IEnumerator EnemyDealAttack()
     {
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.4f);
 
         // Start Attack
-        if (battleEnemy.strength / 4 >= battlePlayer.health)
+        if (battleEnemy.strength / 3 >= battlePlayer.health)
         {
             battleEnemy.SwitchState(battleEnemy.comboState);
             yield return new WaitForSeconds(0.75f);
@@ -134,10 +130,10 @@ public class BattleManager : Singleton<BattleManager>
         else
         {
             battleEnemy.SwitchState(battleEnemy.attackState);
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(0.2f);
             battlePlayer.GetHit();
 
-            battlePlayer.health -= (float)(battleEnemy.strength / 4);
+            battlePlayer.health -= (float)(battleEnemy.strength / 3);
             float newValue = battlePlayer.health / battlePlayer.strength;
             if (newValue <= 0.15f && newValue > 0)
             {
@@ -158,7 +154,7 @@ public class BattleManager : Singleton<BattleManager>
         battleUI.SetActive(false);
         battlePlayerGo.SetActive(false);
         battleEnemyGO.SetActive(false);
-
+        LevelManager.Ins.AllowChooseEnemy();
         if (LevelManager.Ins.GetRemainNumOfEnemies() == 0)
         {
             player.RunToWin();
@@ -173,5 +169,11 @@ public class BattleManager : Singleton<BattleManager>
     public BattleStateMachine GetBattlePlayer()
     {
         return battlePlayer;
+    }
+
+    private void SetEnemyData(int newStrength)
+    {
+        battleEnemy.strength = newStrength;
+        battleEnemy.health = newStrength;
     }
 }

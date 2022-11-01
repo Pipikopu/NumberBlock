@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
-public class LevelManager : Singleton<LevelManager>, IPointerDownHandler
+public class LevelManager : Singleton<LevelManager>
 {
     public Player player;
     public LevelSO levelSO;
@@ -13,12 +13,11 @@ public class LevelManager : Singleton<LevelManager>, IPointerDownHandler
     private int remainEnemies;
 
     public GameObject menuWindow;
-
-
-    //TouchPhase touchPhase = TouchPhase.Ended;
+    public bool canChoose;
 
     private void Start()
     {
+        canChoose = false;
         // Set Player
         SetPlayer();
         // Set Enemy
@@ -27,7 +26,37 @@ public class LevelManager : Singleton<LevelManager>, IPointerDownHandler
 
     private void Update()
     {
-        
+        if (canChoose)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hitInfor;
+                if (Physics.Raycast(ray, out hitInfor))
+                {
+                    Enemy chosenEnemy = hitInfor.collider.GetComponent<Enemy>();
+                    if (chosenEnemy != null)
+                    {
+                        chosenEnemy.OnBeingChosen();
+                    }
+                }
+            }
+
+
+            if (Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Began)
+            {
+                var ray = Camera.main.ScreenPointToRay(Input.touches[0].position);
+                RaycastHit hitInfor;
+                if (Physics.Raycast(ray, out hitInfor))
+                {
+                    Enemy chosenEnemy = hitInfor.collider.GetComponent<Enemy>();
+                    if (chosenEnemy != null)
+                    {
+                        chosenEnemy.OnBeingChosen();
+                    }
+                }
+            }
+        }
     }
 
     private void SetPlayer()
@@ -55,6 +84,10 @@ public class LevelManager : Singleton<LevelManager>, IPointerDownHandler
                 newEnemy.SetStrength(currentEnemySO.strength);
                 newEnemy.SetRowIndex(i);
                 newEnemy.SetEnemyState(Constant.CharacterState.IN_QUEUE);
+                if (j == 0)
+                {
+                    newEnemy.AllowBeingChosen();
+                }
 
                 if (!rowIndexToEnemies.ContainsKey(i))
                 {
@@ -78,6 +111,7 @@ public class LevelManager : Singleton<LevelManager>, IPointerDownHandler
             else
             {
                 currentEnemy.MoveToFront();
+                currentEnemy.AllowBeingChosen();
             }
         }
     }
@@ -98,8 +132,13 @@ public class LevelManager : Singleton<LevelManager>, IPointerDownHandler
         player.AllowPlay();
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public void AllowChooseEnemy()
     {
-       
+        canChoose = true;
+    }
+
+    public void PreventChooseEnemy()
+    {
+        canChoose = false;
     }
 }

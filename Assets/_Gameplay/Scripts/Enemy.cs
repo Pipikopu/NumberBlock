@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour
     public Constant.EnemyType enemyType;
     private Constant.CharacterState enemyState;
     public int strength;
+    public BoxCollider enemyCollider;
 
     [Header("EnemyUI")]
     public Text strengthText;
@@ -16,22 +17,36 @@ public class Enemy : MonoBehaviour
 
     [Header("Position Variables")]
     private int rowIndex;
+    public bool canBeChosen = true;
 
+    private void Start()
+    {
+        canBeChosen = true;
+    }
 
     // Click on the Enemy
     public void OnBeingChosen()
     {
-        // Save current enemy
-        DataManager.Ins.SaveBattleEnemy(enemyType, strength);
+        if (canBeChosen)
+        {
+            canBeChosen = false;
 
-        // Arrange other enemies
-        LevelManager.Ins.RearrangeRows(rowIndex);
+            // Arrange other enemies
+            LevelManager.Ins.RearrangeRows(rowIndex);
 
-        // Battle
-        BattleManager.Ins.MoveToBattle();
+            LevelManager.Ins.PreventChooseEnemy();
 
-        // Remove from choosing field
-        Destroy(this.gameObject);
+            // Battle
+            BattleManager.Ins.MoveToBattle(strength);
+
+            // Remove from choosing field
+            Destroy(this.gameObject);
+        }
+    }
+
+    public void AllowBeingChosen()
+    {
+        enemyCollider.enabled = true;
     }
 
     private void Update()

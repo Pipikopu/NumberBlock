@@ -34,6 +34,8 @@ public class Player : MonoBehaviour
     public GameObject chestClose;
     public GameObject chestOpen;
 
+    private float firstAnimCycleDelay;
+
     private void Start()
     {
         // Player Start Running
@@ -45,11 +47,13 @@ public class Player : MonoBehaviour
 
         //playerAnimator.SetBool("IsIdle", true);
         playerAnimator.SetTrigger("Idle");
+        firstAnimCycleDelay = 0;
     }
 
     private void Update()
     {
-        if (canPlay)
+        firstAnimCycleDelay += Time.deltaTime;
+        if (canPlay && firstAnimCycleDelay >= 1.25f)
         {
             if (isWin)
             {
@@ -91,6 +95,7 @@ public class Player : MonoBehaviour
             playerTransform.position = stopTransform.position;
             playerAnimator.SetTrigger("Idle");
             isIdle = true;
+            LevelManager.Ins.AllowChooseEnemy();
         }
     }
 
@@ -126,14 +131,16 @@ public class Player : MonoBehaviour
     public void RunToWin()
     {
         navigateCanvas.SetActive(false);
-        StartCoroutine(DelayRunToWin());
+        playerAnimator.SetTrigger("Move");
+        isWin = true;
+        speed *= 1.5f;
+        CinemachineManager.Ins.SwitchToWinCam();
+
+       // StartCoroutine(DelayRunToWin());
     }
 
     IEnumerator DelayRunToWin()
     {
-        playerAnimator.SetTrigger("Move");
-        isWin = true;
-
         yield return new WaitForSeconds(2f);
     }
 
@@ -152,12 +159,14 @@ public class Player : MonoBehaviour
     {
         //playerAnimator.SetBool("IsIdle", false);
         playerAnimator.SetTrigger("Move");
-        StartCoroutine(DelayPlay());
+        canPlay = true;
+        navigateCanvas.SetActive(true);
+        //StartCoroutine(DelayPlay());
     }
 
     IEnumerator DelayPlay()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         canPlay = true;
     }
 }

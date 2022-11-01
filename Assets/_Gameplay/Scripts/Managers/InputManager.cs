@@ -7,17 +7,35 @@ public class InputManager : MonoBehaviour, IPointerDownHandler
 {
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log("Hit");
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitInfor;
-        if (Physics.Raycast(ray, out hitInfor))
+        Debug.Log("HitInterface");
+        if (Input.touchCount > 0)
         {
-            Debug.Log("Hit1");
-            var chosenEnemy = hitInfor.collider.GetComponent<Enemy>();
-            if (chosenEnemy != null)
+            var ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            RaycastHit hitInfor;
+            if (Physics.Raycast(ray, out hitInfor))
             {
-                Debug.Log("Hit2");
-                chosenEnemy.OnBeingChosen();
+                Debug.Log("HitInterface1");
+                var chosenEnemy = hitInfor.collider.GetComponent<Enemy>();
+                if (chosenEnemy != null)
+                {
+                    Debug.Log("HitInterface2");
+                    chosenEnemy.OnBeingChosen();
+                }
+            }
+        }
+        else
+        {
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfor;
+            if (Physics.Raycast(ray, out hitInfor))
+            {
+                Debug.Log("HitInterface11");
+                var chosenEnemy = hitInfor.collider.GetComponent<Enemy>();
+                if (chosenEnemy != null)
+                {
+                    Debug.Log("HitInterface21");
+                    chosenEnemy.OnBeingChosen();
+                }
             }
         }
     }

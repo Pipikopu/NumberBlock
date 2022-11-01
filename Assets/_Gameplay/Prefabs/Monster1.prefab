@@ -688,8 +688,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyType: 0
   strength: 0
+  enemyCollider: {fileID: 3092264269286104575}
   strengthText: {fileID: 181090275}
   healthText: {fileID: 3401365268602465947}
+  canBeChosen: 0
 --- !u!65 &3092264269286104575
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -699,9 +701,9 @@ BoxCollider:
   m_GameObject: {fileID: 3092264269286104570}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 3, z: 1.5}
+  m_Size: {x: 1.5, y: 2.5, z: 1.5}
   m_Center: {x: 0, y: 1, z: 0}
 --- !u!64 &2196655658368148152
 MeshCollider:
@@ -712,7 +714,7 @@ MeshCollider:
   m_GameObject: {fileID: 3092264269286104570}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
